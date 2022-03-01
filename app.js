@@ -34,7 +34,7 @@ const WBRouter = require("./routes/wb.route");
 app.use("", WBRouter);
 
 app.get('/', (req, res) => {
-    fs.readFile(`${wbId}.txt`, 'utf8', (err, data) => {
+    fs.readFile(`logs.txt`, 'utf8', (err, data) => {
         if (err) {
             console.error("Error while getting logs:::::::::::::::\n", err);
             delete err?.path;
