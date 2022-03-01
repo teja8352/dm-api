@@ -80,6 +80,9 @@ device.on('error', (error) => {
 device.on('message', (topic, payload) => {
     try {
         let data = `\n
+        \n
+        \n
+        \n
         --------------------------------------------------------
         Topic - ${topic}
         --------------------------------------------------------
@@ -97,7 +100,7 @@ device.on('message', (topic, payload) => {
         ${JSON.stringify(payload, null, 2)}
 
         \n
-        \n\n\n\n\n\n\n`;
+        \n\n\n\n\n\n\n \t\r`;
         fs.appendFile(`logs.txt`, data, (err) => {
             if (err) {
                 console.error("Error while adding data:::::::::::::::\n", err);
@@ -108,6 +111,9 @@ device.on('message', (topic, payload) => {
         });
     } catch (e) {
         const log = `\n
+        \n
+        \n
+        \n
         --------------------------------------------------------
         Topic - ${topic}
         --------------------------------------------------------
@@ -128,7 +134,7 @@ device.on('message', (topic, payload) => {
         Error: \n
         ${JSON.stringify(e, null, 2)}
         \n
-        \n\n\n\n\n\n\n`;
+        \n\n\n\n\n\n\n \t\r`;
         fs.appendFile(`logs.txt`, log, (err) => {
             if (err) {
                 console.error("Error while adding logs:::::::::::::::\n", err);
