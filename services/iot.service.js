@@ -66,6 +66,16 @@ const subscribeIOTError = () => {
 }
 
 const subscribeIOTMessage = () => {
+    let path = "logs/logs.txt";
+    try {
+        if (fs.existsSync(path)) {
+            //file exists
+        } else {
+            path = "../logs/logs.txt"
+        }
+    } catch (err) {
+        console.error(err)
+    }
     try {
         device.on('message', (topic, payload) => {
             console.log("topic::::::::::::::::::::::::\n", topic);
@@ -93,7 +103,7 @@ const subscribeIOTMessage = () => {
         
                 \n
                 \n\n\n\n\n\n\n \t\r`;
-                fs.appendFile(`logs.txt`, data, (err) => {
+                fs.appendFile(path, data, (err) => {
                     if (err) {
                         console.error("Error while adding data:::::::::::::::\n", err);
                         delete err?.path;
@@ -127,7 +137,7 @@ const subscribeIOTMessage = () => {
                 ${JSON.stringify(e, null, 2)}
                 \n
                 \n\n\n\n\n\n\n \t\r`;
-                fs.appendFile(`logs.txt`, log, (err) => {
+                fs.appendFile(path, log, (err) => {
                     if (err) {
                         console.error("Error while adding logs:::::::::::::::\n", err);
                     } else {

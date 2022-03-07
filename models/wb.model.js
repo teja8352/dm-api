@@ -3,9 +3,19 @@ const fs = require("fs");
 const iotService = require('../services/iot.service');
 
 const get = (wbId) => {
-    return new Promise((resolve, reject) => {
+    let path = "logs/logs.txt";
+    try {
+        if (fs.existsSync(path)) {
+            //file exists
+        } else {
+            path = "../logs/logs.txt"
+        }
+    } catch (err) {
+        console.error(err)
+    }
+    return new Promise(async (resolve, reject) => {
         try {
-            fs.readFile(`logs.txt`, 'utf8', (err, data) => {
+            fs.readFile(path, 'utf8', (err, data) => {
                 if (err) {
                     console.error("Error while getting logs:::::::::::::::\n", err);
                     delete err?.path;
