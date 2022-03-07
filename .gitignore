@@ -15,6 +15,7 @@ $RECYCLE.BIN/
 /*.env
 
 *.log
+logs.txt
 log.txt
 npm-debug.log*
 package-lock.json
