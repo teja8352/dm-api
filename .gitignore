@@ -14,8 +14,6 @@ UserInterfaceState.xcuserstate
 $RECYCLE.BIN/
 
 *.log
-logs.txt
-log.txt
 npm-debug.log*
 package-lock.json
 *.bat
