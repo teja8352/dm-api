@@ -20,7 +20,17 @@ const WBRouter = require("./routes/wb.route");
 app.use("", WBRouter);
 
 app.get('/', (req, res) => {
-    fs.readFile(`logs.txt`, 'utf8', (err, data) => {
+    let path = "logs/logs.txt";
+    try {
+        if (fs.existsSync(path)) {
+            //file exists
+        } else {
+            path = "./logs/logs.txt"
+        }
+    } catch (err) {
+        console.error(err)
+    }
+    fs.readFile(path, 'utf8', (err, data) => {
         if (err) {
             console.error("Error while getting logs:::::::::::::::\n", err);
             delete err?.path;
