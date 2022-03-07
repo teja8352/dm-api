@@ -22,6 +22,7 @@ const subscribeAWSIOT = () => {
                     console.log("Error while subscribing::::::::::::::::::\n", err);
                 } else {
                     console.log("IOT Connection subscribed");
+                    subscribeIOTMessage();
                 }
             });
         } catch (e) {
@@ -178,16 +179,15 @@ const endIOTConnection = () => {
 const publishTopic = (payload) => {
     return new Promise((resolve, reject) => {
         payload.date = new Date().toLocaleString();
-        setTimeout(() => {
-            device.publish(process.env.TOPICHOUSE, JSON.stringify(payload), {}, (err) => {
-                if (err) {
-                    console.log("Error while publishing::::::::::::::::::\n", err);
-                    reject(err);
-                } else {
-                    resolve({ message: "Data published", data: payload });
-                }
-            });
-        }, 500);
+        device.publish(process.env.TOPICHOUSE, JSON.stringify(payload), {}, (err) => {
+            if (err) {
+                console.log("Error while publishing::::::::::::::::::\n", err);
+                reject(err);
+            } else {
+                console.log("Publilshed::::::::::::::::::::::::\n", payload);
+                resolve({ message: "Data published", data: payload });
+            }
+        });
     });
 };
 
