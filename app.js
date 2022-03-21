@@ -13,10 +13,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: "*" }));
 
 // Firebase
-const firebase = require('firebase');
-const firebaseConfig = require('./config/firebase');
-const _FBDB = firebase.initializeApp(firebaseConfig);
-const firestore = _FBDB.firestore();
+const firebaseAdmin = require('firebase-admin');
+const serviceAccount = require("./config/service_account.json");
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount),
+    databaseURL: "https://weighing-bridge-mech.firebaseio.com"
+});
+const firestore = firebaseAdmin.firestore();
 
 // Routes
 // const WBRouter = require("./routes/wb.route");
@@ -92,14 +95,18 @@ iotDevice.on('connect', () => {
     }
 });
 
-iotDevice.on('message', async (topic, payload) => {
+iotDevice.on('message', (topic, payload) => {
     console.log("topic::::::::::::::::::::::::\n", topic);
     console.log("payload::::::::::::::::::::::::\n", payload);
     try {
         const data = { ...payload, topic, date: new Date().toLocaleString() };
-        await firestore.collection("weighingscale").doc().set(data);
+        firestore.collection("weighingscale").doc().set(data).then(() => {
+            console.log('data written to firestore');
+        }, err => {
+            console.error("Error while adding data to firebase:::::::::::::::::::::::\n", err);
+        });
     } catch (e) {
-        console.error("Eception while adding data to firebase:::::::::::::::::::::::\n", e);
+        console.error("Exception while adding data to firebase:::::::::::::::::::::::\n", e);
     }
     // try {
     //     let data = `\r\n
