@@ -225,7 +225,7 @@ app.get("/wb", (req, res) => {
 app.post("/wb/add", (req, res) => {
     let payload = req.body;
     payload.date = new Date().toLocaleString();
-    iotDevice.publish(process.env.TOPICHOUSE, payload, {}, (err) => {
+    iotDevice.publish(process.env.TOPICHOUSE, JSON.stringify(payload), {}, (err) => {
         if (err) {
             console.log("Error while publishing::::::::::::::::::\n", err);
             res.status(400).json({ ...err });
