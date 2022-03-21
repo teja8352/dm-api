@@ -83,7 +83,7 @@ const iotDevice = awsIot.device({
 iotDevice.on('connect', () => {
     console.log('Connecting to AWS IoT Core'); // We Attach handler callback to a specific topic
     try {
-        iotDevice.subscribe(process.env.TOPICCOREBROADCAST, {}, (err) => {
+        iotDevice.subscribe(process.env.DBSUBSCRIBER, {}, (err) => {
             if (err) {
                 console.log("Error while subscribing::::::::::::::::::\n", err);
             } else {
@@ -101,7 +101,7 @@ iotDevice.on('message', (topic, payload) => {
     try {
         const data = { ...JSON.parse(payload), topic, date: new Date().toLocaleString() };
         console.log("Data:::::::::::::::::::\n", data);
-        firestore.collection("weighingscale").doc().set(data).then(() => {
+        firestore.collection(topic).doc().set(data).then(() => {
             console.log('data written to firestore');
         }, err => {
             console.error("Error while adding data to firebase:::::::::::::::::::::::\n", err);
