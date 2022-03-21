@@ -12,6 +12,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ origin: "*" }));
 
+// Firebase
+const firebase = require('firebase');
+const firebaseConfig = require('./config/firebase');
+const _FBDB = firebase.initializeApp(firebaseConfig);
+const firestore = _FBDB.firestore();
+
 // Routes
 // const WBRouter = require("./routes/wb.route");
 
@@ -68,6 +74,7 @@ const iotDevice = awsIot.device({
     clientId: "weighingscale1",
     port: 8883,
     host: "at3kcp9lznzcy-ats.iot.ap-south-1.amazonaws.com",
+    region: "ap-south-1"
 });
 
 iotDevice.on('connect', () => {
@@ -85,94 +92,100 @@ iotDevice.on('connect', () => {
     }
 });
 
-iotDevice.on('message', (topic, payload) => {
+iotDevice.on('message', async (topic, payload) => {
     console.log("topic::::::::::::::::::::::::\n", topic);
     console.log("payload::::::::::::::::::::::::\n", payload);
     try {
-        let data = `\r\n
-        \n
-        \n
-        \n
-        --------------------------------------------------------
-        Topic - ${topic}
-        --------------------------------------------------------
-        \n
-        \n
-        \n
-        \n
-        --------------------------------------------------------
-        Date - ${new Date().toLocaleString()}
-        --------------------------------------------------------
-        \n
-        \n
-
-        Payload: \n
-        ${JSON.stringify(payload, null, 2)}
-
-        \n
-        \n\n\n\n\n\n\n \t\r`;
-        let path = "logs/logs.txt";
-        try {
-            if (fs.existsSync(path)) {
-                //file exists
-            } else {
-                path = "./logs/logs.txt"
-            }
-        } catch (err) {
-            console.error(err)
-        }
-        fs.appendFile(path, data, (err) => {
-            if (err) {
-                console.error("Error while adding data:::::::::::::::\n", err);
-                delete err?.path;
-            } else {
-                console.log('Data added');
-            }
-        });
+        const data = { ...payload, topic, date: new Date().toLocaleString() };
+        await firestore.collection("weighingscale").doc().set(data);
     } catch (e) {
-        const log = `\r\n
-        \n
-        \n
-        \n
-        --------------------------------------------------------
-        Topic - ${topic}
-        --------------------------------------------------------
-        \n
-        \n
-        \n
-        \n
-        --------------------------------------------------------
-        Date - ${new Date().toLocaleString()}
-        --------------------------------------------------------
-        \n
-        \n
-
-        Payload: \n
-        ${JSON.stringify(payload, null, 2)}
-        \n
-        \n
-        Error: \n
-        ${JSON.stringify(e, null, 2)}
-        \n
-        \n\n\n\n\n\n\n \t\r`;
-        let path = "logs/logs.txt";
-        try {
-            if (fs.existsSync(path)) {
-                //file exists
-            } else {
-                path = "./logs/logs.txt"
-            }
-        } catch (err) {
-            console.error(err)
-        }
-        fs.appendFile(path, log, (err) => {
-            if (err) {
-                console.error("Error while adding logs:::::::::::::::\n", err);
-            } else {
-                console.log('Logs added');
-            }
-        });
+        console.error("Eception while adding data to firebase:::::::::::::::::::::::\n", e);
     }
+    // try {
+    //     let data = `\r\n
+    //     \n
+    //     \n
+    //     \n
+    //     --------------------------------------------------------
+    //     Topic - ${topic}
+    //     --------------------------------------------------------
+    //     \n
+    //     \n
+    //     \n
+    //     \n
+    //     --------------------------------------------------------
+    //     Date - ${new Date().toLocaleString()}
+    //     --------------------------------------------------------
+    //     \n
+    //     \n
+
+    //     Payload: \n
+    //     ${JSON.stringify(payload, null, 2)}
+
+    //     \n
+    //     \n\n\n\n\n\n\n \t\r`;
+    //     let path = "logs/logs.txt";
+    //     try {
+    //         if (fs.existsSync(path)) {
+    //             //file exists
+    //         } else {
+    //             path = "./logs/logs.txt"
+    //         }
+    //     } catch (err) {
+    //         console.error(err)
+    //     }
+    //     fs.appendFile(path, data, (err) => {
+    //         if (err) {
+    //             console.error("Error while adding data:::::::::::::::\n", err);
+    //             delete err?.path;
+    //         } else {
+    //             console.log('Data added');
+    //         }
+    //     });
+    // } catch (e) {
+    //     const log = `\r\n
+    //     \n
+    //     \n
+    //     \n
+    //     --------------------------------------------------------
+    //     Topic - ${topic}
+    //     --------------------------------------------------------
+    //     \n
+    //     \n
+    //     \n
+    //     \n
+    //     --------------------------------------------------------
+    //     Date - ${new Date().toLocaleString()}
+    //     --------------------------------------------------------
+    //     \n
+    //     \n
+
+    //     Payload: \n
+    //     ${JSON.stringify(payload, null, 2)}
+    //     \n
+    //     \n
+    //     Error: \n
+    //     ${JSON.stringify(e, null, 2)}
+    //     \n
+    //     \n\n\n\n\n\n\n \t\r`;
+    //     let path = "logs/logs.txt";
+    //     try {
+    //         if (fs.existsSync(path)) {
+    //             //file exists
+    //         } else {
+    //             path = "./logs/logs.txt"
+    //         }
+    //     } catch (err) {
+    //         console.error(err)
+    //     }
+    //     fs.appendFile(path, log, (err) => {
+    //         if (err) {
+    //             console.error("Error while adding logs:::::::::::::::\n", err);
+    //         } else {
+    //             console.log('Logs added');
+    //         }
+    //     });
+    // }
 });
 
 app.get("/wb", (req, res) => {
