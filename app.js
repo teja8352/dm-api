@@ -99,7 +99,8 @@ iotDevice.on('message', (topic, payload) => {
     console.log("topic::::::::::::::::::::::::\n", topic);
     console.log("payload::::::::::::::::::::::::\n", payload);
     try {
-        const data = { ...payload, topic, date: new Date().toLocaleString() };
+        const data = { ...JSON.parse(payload), topic, date: new Date().toLocaleString() };
+        console.log("Data:::::::::::::::::::\n", data);
         firestore.collection("weighingscale").doc().set(data).then(() => {
             console.log('data written to firestore');
         }, err => {
