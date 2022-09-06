@@ -2,14 +2,7 @@ const express = require('express');
 const cors = require("cors");
 const fs = require("fs");
 const app = express();
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-    }
-});
+
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -38,11 +31,30 @@ const testimonialRouter = require("./routes/testimonial.route");
 
 app.use("", testimonialRouter);
 
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
+    }
+});
+
+// const transporter = nodemailer.createTransport(smtpTransport({
+//     service: 'gmail',
+//     host: 'smtp.gmail.com',
+//     auth: {
+//         user: process.env.EMAIL,
+//         pass: process.env.PASSWORD
+//     }
+// }));
+
 app.post('/send-mail', (req, res) => {
     const mailConfigurations = {
 
         // It should be a string of sender email
-        from: process.env.EMAIL,
+        from: req.body.email,
 
         // Comma Separated list of mails
         to: 'ktejaat1995@gmail.com',
@@ -60,6 +72,7 @@ app.post('/send-mail', (req, res) => {
 
     transporter.sendMail(mailConfigurations, (error, info) => {
         if (error) {
+            console.error("Error while sending mail:::::::::::\n", error);
             res.status(400).json({
                 message: "Something went wrong!",
                 error: { ...error }
