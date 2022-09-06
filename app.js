@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require("cors");
 const fs = require("fs");
 const app = express();
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
+    }
+});
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -29,6 +37,41 @@ app.use(cors({ origin: "*" }));
 const testimonialRouter = require("./routes/testimonial.route");
 
 app.use("", testimonialRouter);
+
+app.post('/send-mail', (req, res) => {
+    const mailConfigurations = {
+
+        // It should be a string of sender email
+        from: process.env.EMAIL,
+
+        // Comma Separated list of mails
+        to: 'ktejaat1995@gmail.com',
+
+        // Subject of Email
+        subject: req.body.subject,
+
+        // This would be the text of email body
+        html: `
+                <h2>From: ${req.body.email}</h2>
+                <h4>Subject: ${req.body.subject}</h4>
+                <p>Hi! there, ${req.body.name} here. \n \n \n ${req.body.message}</p>
+            `
+    };
+
+    transporter.sendMail(mailConfigurations, (error, info) => {
+        if (error) {
+            res.status(400).json({
+                message: "Something went wrong!",
+                error: { ...error }
+            });
+        } else {
+            res.status(200).json({
+                message: "Email Sent Successfully",
+                info: { ...info }
+            });
+        }
+    });
+});
 
 // app.get('/', (req, res) => {
 //     let path = "logs/logs.txt";
